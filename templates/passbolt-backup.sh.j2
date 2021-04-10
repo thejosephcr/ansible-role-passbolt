@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+#{{ ansible_managed }}
+
+# create temporary directory
+TMPFILE=$(mktemp /tmp/mysqldump.XXXXXX)
+TIMENAME=$(date +%Y%m%d-%H%M%S)
+
+#cleanup database
+sudo su -s /bin/bash -c "{{ passbolt_root }}/bin/cake passbolt cleanup" {{ passbolt_user }}
+
+# back up database
+/usr/bin/mysqldump -u{{ backup_db_user }} -p{{ backup_db_pass }} --databases {{ backup_db }} > $TMPFILE
+
+# create backup archive
+/bin/tar cvzf {{ backup_path }}/$TIMENAME.{{ backup_identifier }}.tgz $TMPFILE
+
+# clean up temporary directory
+rm -f $TMPFILE
+
+# prune stale backups
+/usr/bin/find {{ backup_path }}/ -name "*\.{{ backup_identifier }}.tgz" -ctime +{{ retention_period }} -delete
+
+{% if backup_replica != inventory_hostname %}
+# sync file with other servers
+sudo su -c "/usr/bin/rsync {{ backup_path }}/$TIMENAME.{{ backup_identifier }}.tgz {{ backup_replica }}:{{ backup_path }}/ --progress --ignore-existing" {{ passbolt_user_replication }}
+{% endif %}
+{% if backup_replica == inventory_hostname %}
+# prune stale backups of master server
+/usr/bin/find {{ backup_path }}/ -name "*\.passbolt-{{ passbolt_master }}.tgz" -ctime +{{ (retention_period |int + 7) }} -delete
+{% endif %}

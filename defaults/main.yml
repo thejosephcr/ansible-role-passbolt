@@ -1,0 +1,40 @@
+---
+nginx_conf_dir: /etc/nginx
+
+acme_certificate_email: any@something.com
+acme_certificate_cf_account_email: any@someone.com
+acme_certificate_cf_account_token: 1234567890
+
+mysql_root_user: root
+mysql_root_password: ChangeMe.01!
+
+php_default_version_debian: "7.4"
+php_webserver_daemon: nginx
+
+passbolt_release: v3.1.0
+passbolt_url: "https://passbolt.example.com"
+
+passbolt_log_file: /var/log/passbolt.log
+passbolt_web_root: /var/www
+passbolt_smtp_host: #email server
+passbolt_smtp_port: #email port
+
+passbolt_backup_target: /backups/
+passbolt_backup_bin: /usr/local/bin/passbolt-backup
+passbolt_restore_bin: /usr/local/bin/passbolt-restore
+passbolt_retention_backup: 5
+passbolt_user_replication: # Only with replication
+
+passbolt_master: "{{ ansible_hostname }}"
+# passbolt_slave: # secondary server, its receive rsync backups
+
+passbolt_user: www-data
+passbolt_group: www-data
+passbolt_db_root_user: root
+passbolt_db_root_pass: ChangeMe.01!
+passbolt_db_name: passbolt
+passbolt_db_user: passbolt
+passbolt_db_pass: ChangeMe.01!
+passbolt_gpg_fingerprint: #fingerprint
+passbolt_gpg_pubkey_secret: #public key
+passbolt_gpg_privkey_secret: #private key

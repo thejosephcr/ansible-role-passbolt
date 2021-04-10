@@ -1,0 +1,14 @@
+---
+- name: install required packages
+  package:
+    name:
+      - composer
+      - git
+  tags:
+    - initiation
+
+- name: install passbolt
+  include: install.yml
+
+- name: configure backup and restore process
+  include: backup.yml

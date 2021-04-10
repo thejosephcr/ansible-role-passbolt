@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: WPN Operations team
+  description: An Ansible role to install and configure Passbolt
+  license: MIT
+  min_ansible_version: 2.9.11
+  platforms:
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+
+dependencies:
+  - role: nephelaiio.plugins
+  - role: geerlingguy.nginx
+  - role: nephelaiio.acme_certificate_cloudflare
+  - role: geerlingguy.mysql
+  - role: geerlingguy.php

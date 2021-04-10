@@ -1,0 +1,5 @@
+StrictHostKeyChecking no
+#infinity
+Host {{ ssh_replica_host }}
+  User {{ ssh_replica_user }}
+  Identityfile {{ ssh_path }}/{{ ssh_key_filename }}

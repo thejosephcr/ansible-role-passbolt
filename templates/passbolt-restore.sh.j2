@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+#{{ ansible_managed }}
+
+unset -v latest_backup
+unset -v rst_option
+unset -v rst_origin
+unset -v origin_file
+
+echo -e "Are you sure you want to restore? Yes/No";
+read rst_option;
+
+if [ $rst_option == 'Yes' ];
+  then
+    echo -e "Do you want to restore with Master or Slave database? Master/Slave";
+    read rst_origin;
+
+    if [ $rst_origin == 'Master' ];
+      then
+        origin_file=passbolt-{{ passbolt_master }};
+    fi
+    if [ $rst_origin == 'Slave' ];
+      then
+        origin_file=passbolt-{{ passbolt_slave }};
+    fi
+
+    if [ -n '$origin_file' ];
+      then
+
+        # find latest backup file
+        for file in $(find {{ backup_path }} -type f -name *$origin_file.tgz)
+        do
+          [[ $file -nt $latest_backup ]] && latest_backup=$file
+        done
+        if [ -n '$lastest_backup' ]
+          then
+            echo -e "Using $latest_backup file"
+
+            # stop services
+            systemctl stop nginx
+
+            # restore file backup
+            tar xvzf $latest_backup -C /
+
+            # restore database backup
+            mysqldump=$(tar tzf $latest_backup | grep mysqldump)
+            mysql < /$mysqldump
+
+            sudo su -s /bin/bash -c "{{ passbolt_root }}/bin/cake passbolt cleanup" {{ passbolt_user }}
+
+            # start services
+            systemctl start nginx
+          else
+            echo -e "File not found"
+        fi
+    fi
+fi

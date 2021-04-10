@@ -1,0 +1,15 @@
+---
+- name: Install Passbolt
+
+  hosts: passbolt
+
+  environment: "{{ proxy_env | default({}) }}"
+
+  tasks:
+    - include_tasks: ../dns/nsupdate.yml
+      loop_control:
+        loop_var: nsrecord
+      with_items:
+        - name: "{{ passbolt_hostname }}"
+          type: CNAME
+          value: "{{ ansible_fqdn }}."

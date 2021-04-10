@@ -1,0 +1,14 @@
+---
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: restart php-fpm
+  service:
+    name: "php{{ php_default_version_debian }}-fpm"
+    state: restarted
+
+- name: update ca certificates
+  command: /usr/sbin/update-ca-certificates
+  listen: update ca
