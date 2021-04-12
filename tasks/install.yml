@@ -137,19 +137,3 @@
     user: "{{ passbolt_user }}"
   tags:
     - configure
-
-# If you create a new installation, you need to run> sudo su -s /bin/bash -c "./bin/cake passbolt install" www-data
-
-- name: healthcheck installation
-  command: |
-    {{ passbolt_root }}/bin/cake passbolt healthcheck
-  become_user: "{{ passbolt_user }}"
-  register: healthcheck_status
-  tags:
-    - configure
-
-- debug:
-    msg: |
-      {{ healthcheck_status }}
-  tags:
-    - configure
