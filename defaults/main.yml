@@ -16,8 +16,8 @@ passbolt_url: "https://passbolt.example.com"
 
 passbolt_log_file: /var/log/passbolt.log
 passbolt_web_root: /var/www
-passbolt_smtp_host: #email server
-passbolt_smtp_port: #email port
+passbolt_smtp_host: # email server
+passbolt_smtp_port: # email port
 
 passbolt_backup_target: /backups/
 passbolt_backup_bin: /usr/local/bin/passbolt-backup
@@ -35,6 +35,6 @@ passbolt_db_root_pass: ChangeMe.01!
 passbolt_db_name: passbolt
 passbolt_db_user: passbolt
 passbolt_db_pass: ChangeMe.01!
-passbolt_gpg_fingerprint: #fingerprint
-passbolt_gpg_pubkey_secret: #public key
-passbolt_gpg_privkey_secret: #private key
+passbolt_gpg_fingerprint: # fingerprint
+passbolt_gpg_pubkey_secret: # public key
+passbolt_gpg_privkey_secret: # private key
