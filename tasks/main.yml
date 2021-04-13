@@ -9,6 +9,7 @@
 
 - name: install passbolt
   include: install.yml
+  become: yes
 
 - name: configure backup and restore process
   include: backup.yml
