@@ -104,7 +104,7 @@
         - replica
 
     - name: read ssh public key
-      set_facts:
+      set_fact:
         passbolt_ssh_public_key: "{{ item }}"
       with_file:
         - "/home/{{ passbolt_user_replication }}/.ssh/passbolt.pub"
