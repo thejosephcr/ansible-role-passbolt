@@ -8,7 +8,7 @@ platforms:
     image: geerlingguy/docker-${MOLECULE_DISTRO:-ubuntu2004}-ansible
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     privileged: true
-    volume_mounts:
+    volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     pre_build_image: true
 provisioner:
