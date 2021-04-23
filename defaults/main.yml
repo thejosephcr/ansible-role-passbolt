@@ -1,10 +1,6 @@
 ---
 nginx_conf_dir: /etc/nginx
 
-acme_certificate_email: any@something.com
-acme_certificate_cf_account_email: any@someone.com
-acme_certificate_cf_account_token: 1234567890
-
 mysql_root_user: root
 mysql_root_password: ChangeMe.01!
 
@@ -13,6 +9,7 @@ php_webserver_daemon: nginx
 
 passbolt_release: v3.1.0
 passbolt_url: "https://passbolt.example.com"
+passbolt_host: "{{ passbolt_url | urlsplit('hostname') }}"
 
 passbolt_log_file: /var/log/passbolt.log
 passbolt_web_root: /var/www
@@ -41,3 +38,115 @@ passbolt_db_pass: ChangeMe.01!
 passbolt_gpg_fingerprint: qwertyuiop
 passbolt_gpg_pubkey_secret: ChangeMe.01!
 passbolt_gpg_privkey_secret: ChangeMe.01!
+
+nginx_user: "{{ passbolt_user }}"
+nginx_group: "{{ passbolt_group }}"
+nginx_vhost_extra: |
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_pass  unix:/var/run/php/php{{ php_default_version_debian }}-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_buffer_size 128k;
+        fastcgi_buffers 256 16k;
+        fastcgi_busy_buffers_size 256k;
+        fastcgi_temp_file_write_size 256k;
+    }
+    # Don't log favicon
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+    # Don't log robots
+    location = /robots.txt  {
+        access_log off;
+        log_not_found off;
+    }
+    # Deny all attempts to access hidden files/folders such as .htaccess, .htpasswd, .DS_Store (Mac), etc...
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    # Deny all grunt, composer files
+    location ~* (Gruntfile|package|composer)\.(js|json)$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    # A long browser cache lifetime can speed up repeat visits to your page
+    location ~* \.(jpg|jpeg|gif|png|webp|svg|woff|woff2|ttf|css|js|ico|xml)$ {
+      access_log        off;
+      log_not_found     off;
+      expires           360d;
+    }
+
+nginx_vhost_proto:
+  http:
+    - listen: "80"
+      server_name: "{{ passbolt_host }}"
+      filename: "{{ passbolt_host }}.http.conf"
+      access_log: "/var/log/nginx/{{ passbolt_host }}.access.log"
+      error_log: "/var/log/nginx/{{ passbolt_host }}.error.log"
+      extra_parameters: |
+        {{ nginx_vhost_extra }}
+  https:
+    - listen: "80"
+      server_name: "{{ passbolt_host }}"
+      filename: "{{ passbolt_host }}.http.conf"
+      access_log: "/var/log/nginx/{{ passbolt_host }}.access.log"
+      error_log: "/var/log/nginx/{{ passbolt_host }}.error.log"
+      extra_parameters: |
+        return 301 https://{{ passbolt_host }}$request_uri;
+    - listen: "443 ssl http2"
+      server_name: "{{ passbolt_host }}"
+      root: "{{ passbolt_root }}/webroot/"
+      index: index.php
+      access_log: "/var/log/nginx/{{ passbolt_host }}.access.log"
+      error_log: "/var/log/nginx/{{ passbolt_host }}.error.log"
+      state: "present"
+      filename: "{{ passbolt_host }}.https.conf"
+      extra_parameters: |
+        {{ nginx_vhost_extra }}
+        ssl_certificate {{ passbolt_certificate_chainfile }};
+        ssl_certificate_key {{ passbolt_certificate_keyfile }};
+        ssl_protocols       TLSv1.1 TLSv1.2;
+        ssl_ciphers         HIGH:!aNULL:!MD5;
+
+nginx_vhosts: "{{ nginx_vhost_proto[passbolt_url | urlsplit('proto')] }}"
+
+mysql_packages:
+  - mariadb-server
+  - mariadb-client
+mysql_databases:
+  - name: "{{ passbolt_db_name }}"
+    encoding: utf8mb4
+    collation: utf8mb4_unicode_ci
+mysql_users:
+  - name: "{{ passbolt_db_user }}"
+    password: "{{ passbolt_db_pass }}"
+    priv: "{{ passbolt_db_name }}.*:ALL"
+
+php_packages_extra:
+  - php{{ php_default_version_debian }}-mysql
+  - php{{ php_default_version_debian }}-intl
+  - php{{ php_default_version_debian }}-readline
+  - php{{ php_default_version_debian }}-imagick
+  - php{{ php_default_version_debian }}-gnupg
+  - php{{ php_default_version_debian }}-ldap
+  - php{{ php_default_version_debian }}-bz2
+  - php{{ php_default_version_debian }}-zip
+  - php{{ php_default_version_debian }}-gmp
+  - php{{ php_default_version_debian }}-xsl
+
+passbolt_hostname: "{{ passbolt_url | urlsplit('hostname') }}"
+passbolt_root: "{{ passbolt_web_root }}/passbolt"
+passbolt_gpg_privkey: "{{ passbolt_web_root }}/config/gpg/private.key"
+passbolt_gpg_pubkey: "{{ passbolt_web_root }}/config/gpg/public.key"
+passbolt_gpg_keyring: "{{ passbolt_web_root }}/.gnupg"
+passbolt_temp: "{{ passbolt_root }}/tmp"
+passbolt_gpg_email: "gpg@{{ passbolt_host }}"

@@ -13,6 +13,5 @@ galaxy_info:
 dependencies:
   - role: nephelaiio.plugins
   - role: geerlingguy.nginx
-  - role: nephelaiio.acme_certificate_cloudflare
   - role: geerlingguy.mysql
   - role: geerlingguy.php
