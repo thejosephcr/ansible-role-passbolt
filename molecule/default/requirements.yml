@@ -1,6 +1,5 @@
 ---
 - nephelaiio.plugins
 - geerlingguy.nginx
-- nephelaiio.acme_certificate_cloudflare
 - geerlingguy.mysql
 - geerlingguy.php

@@ -4,8 +4,6 @@
     name:
       - composer
       - git
-  tags:
-    - initiation
 
 - name: install passbolt
   include: install.yml
