@@ -44,7 +44,8 @@ passbolt_retention_backup: 5
 passbolt_user_replication: ""
 
 passbolt_master: "{{ ansible_hostname }}"
-passbolt_slave: "{{ ansible_hostname }}" # secondary server, its receive rsync backups
+# secondary server, rsync backups from master
+passbolt_slave: "{{ ansible_hostname }}"
 
 passbolt_user: www-data
 passbolt_group: www-data
