@@ -16,10 +16,5 @@
       retries: 12
       delay: 15
 
-    - name: create passbolt directories
-      file:
-        path: /backups
-        state: directory
-
     - name: take passbolt backup
       command: /usr/local/bin/passbolt-backup

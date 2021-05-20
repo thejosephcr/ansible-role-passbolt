@@ -127,6 +127,11 @@
     state: present
     user: "{{ passbolt_user }}"
 
+- name: create passbolt directories
+  file:
+    path: "{{ passbolt_backup_target }}"
+    state: directory
+
 - name: create passbolt backup script
   template:
     src: templates/passbolt-backup.sh.j2
