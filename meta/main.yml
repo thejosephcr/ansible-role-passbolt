@@ -12,6 +12,20 @@ galaxy_info:
 
 dependencies:
   - role: nephelaiio.plugins
+  - role: nephelaiio.nfs
+    vars:
+      nfs_server: "{{ passbolt_nfs_server }}"
   - role: geerlingguy.nginx
+    vars:
+      nginx_vhosts: "{{ passbolt_nginx_vhosts }}"
   - role: geerlingguy.mysql
+    vars:
+      mysql_packages: "{{ passbolt_mysql_packages }}"
+      mysql_root_user: "{{ passbolt_mysql_root_user }}"
+      mysql_root_password: "{{ passbolt_mysql_root_password }}"
+      mysql_databases: "{{ passbolt_mysql_databases }}"
+      mysql_users: "{{ passbolt_mysql_users }}"
   - role: geerlingguy.php
+    vars:
+      php_webserver_daemon: "{{ passbolt_php_webserver_daemon }}"
+      php_packages_extra: "{{ passbolt_php_packages_extra }}"

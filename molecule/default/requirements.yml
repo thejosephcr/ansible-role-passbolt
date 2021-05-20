@@ -1,5 +1,6 @@
 ---
 - nephelaiio.plugins
+- nephelaiio.nfs
 - geerlingguy.nginx
 - geerlingguy.mysql
 - geerlingguy.php

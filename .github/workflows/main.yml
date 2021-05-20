@@ -11,7 +11,7 @@ on:
 
 defaults:
   run:
-    working-directory: 'mlaurent205.ansible-role-passbolt'
+    working-directory: 'wpnops.passbolt'
 
 jobs:
 
@@ -22,7 +22,7 @@ jobs:
       - name: check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'mlaurent205.ansible-role-passbolt'
+          path: 'wpnops.passbolt'
 
       - name: set up Python 3.
         uses: actions/setup-python@v2
@@ -42,12 +42,15 @@ jobs:
     strategy:
       matrix:
         image:
-          - geerlingguy/docker-ubuntu2004-ansible:latest
+          - ubuntu2004
+          - ubuntu1804
+          - centos7
+          - debian10
     steps:
       - name: check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'mlaurent205.ansible-role-passbolt'
+          path: 'wpnops.passbolt'
 
       - name: set up python 3
         uses: actions/setup-python@v2
@@ -55,7 +58,7 @@ jobs:
           python-version: '3.x'
 
       - name: install test dependencies.
-        run: pip3 install ansible molecule[docker]
+        run: pip3 install ansible molecule[docker] docker pytest pytest-testinfra
 
       - name: run Molecule tests.
         run: molecule test

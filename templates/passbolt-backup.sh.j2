@@ -13,7 +13,7 @@ sudo su -s /bin/bash -c "{{ passbolt_root }}/bin/cake passbolt cleanup" {{ passb
 /usr/bin/mysqldump -u{{ backup_db_user }} -p{{ backup_db_pass }} --databases {{ backup_db }} > $TMPFILE
 
 # create backup archive
-/bin/tar cvzf {{ backup_path }}/$TIMENAME.{{ backup_identifier }}.tgz $TMPFILE
+/bin/tar cvzf {{ backup_path }}/$TIMENAME.{{ backup_identifier }}.tgz $TMPFILE {{ passbolt_config }}
 
 # clean up temporary directory
 rm -f $TMPFILE

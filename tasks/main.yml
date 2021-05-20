@@ -1,13 +1,176 @@
 ---
 - name: install required packages
   package:
-    name:
-      - composer
-      - git
+    name: "{{ passbolt_packages }}"
 
-- name: install passbolt
-  include: install.yml
-  become: yes
+- name: clean gpg keyring
+  file:
+    path: "{{ passbolt_gpg_keyring }}"
+    state: absent
+  changed_when: False
 
-- name: configure backup and restore process
-  include: backup.yml
+- name: create passbolt directories
+  file:
+    path: "{{ item | dirname }}"
+    state: directory
+  with_items:
+    - "{{ passbolt_web_root }}/.composer"
+    - "{{ passbolt_temp }}"
+    - "{{ passbolt_gpg_privkey }}"
+    - "{{ passbolt_gpg_pubkey }}"
+
+- name: clone passbolt repository
+  git:
+    repo: https://github.com/passbolt/passbolt_api.git
+    dest: "{{ passbolt_root }}"
+    version: "{{ passbolt_release }}"
+    force: yes
+  notify:
+    - restart nginx
+
+- name: loading passbolt gpg keys
+  copy:
+    content: |
+      {{ item.cont }}
+    dest: "{{ item.dest }}"
+    owner: "{{ passbolt_user }}"
+    group: "{{ passbolt_group }}"
+    mode: 0640
+  with_items:
+    - cont: "{{ passbolt_gpg_privkey_secret }}"
+      dest: "{{ passbolt_gpg_privkey }}"
+    - cont: "{{ passbolt_gpg_pubkey_secret }}"
+      dest: "{{ passbolt_gpg_pubkey }}"
+  no_log: yes
+
+- name: create passbolt gpg keyring
+  file:
+    state: directory
+    path: "{{ passbolt_gpg_keyring }}"
+    owner: "{{ passbolt_user }}"
+    group: "{{ passbolt_group }}"
+    mode: 0700
+  changed_when: False
+
+- name: fix passbolt directory permissions
+  file:
+    path: "{{ passbolt_web_root }}"
+    owner: "{{ passbolt_user }}"
+    group: "{{ passbolt_group }}"
+    mode: "u+rw"
+    state: directory
+    recurse: yes
+  changed_when: False
+
+- name: use composer to install dependencies
+  composer:
+    command: install
+    working_dir: "{{ passbolt_root }}"
+    no_dev: yes
+  become_user: "{{ passbolt_user }}"
+
+- name: import passbolt gpg keyring keys
+  shell: "gpg --home {{ passbolt_gpg_keyring }} --import {{ item }}"
+  with_items:
+    - "{{ passbolt_gpg_privkey }}"
+    - "{{ passbolt_gpg_pubkey }}"
+  become_user: "{{ passbolt_user }}"
+  changed_when: False
+  tags:
+    - skip_ansible_lint
+
+- name: set passbolt config file
+  set_fact:
+    _passbolt_config_file: "{{ passbolt_root }}/config/passbolt.php"
+
+- name: create passbolt configuration file
+  template:
+    src: templates/passbolt.php.j2
+    dest: "{{ _passbolt_config_file }}"
+    owner: "{{ passbolt_user }}"
+    group: "{{ passbolt_group }}"
+    mode: 0750
+  vars:
+    base_url: "{{ passbolt_url }}"
+    db_host: localhost
+    db_name: "{{ passbolt_db_name }}"
+    db_user: "{{ passbolt_db_user }}"
+    db_pass: "{{ passbolt_db_pass }}"
+    email_address: "{{ passbolt_gpg_email }}"
+    email_user: "{{ passbolt_email_user }}"
+    email_host: "{{ passbolt_smtp_host }}"
+    email_port: "{{ passbolt_smtp_port }}"
+    keyring: "{{ passbolt_gpg_keyring }}"
+    pubkey: "{{ passbolt_gpg_pubkey }}"
+    privkey: "{{ passbolt_gpg_privkey }}"
+    fingerprint: "{{ passbolt_gpg_fingerprint }}"
+
+- name: create passbolt log file
+  file:
+    path: "{{ passbolt_log_file }}"
+    state: touch
+    owner: "{{ passbolt_user }}"
+    group: "{{ passbolt_group }}"
+  changed_when: false
+
+- name: create log cronjob
+  cron:
+    name: 'passbolt log'
+    job: "{{ passbolt_root }}/bin/cron >> {{ passbolt_log_file }}"
+    state: present
+    user: "{{ passbolt_user }}"
+
+- name: create email cronjob
+  cron:
+    name: 'send passbolt emails'
+    job: "{{ passbolt_root }}/bin/cake EmailQueue.sender >> {{ passbolt_log_file }}"
+    state: present
+    user: "{{ passbolt_user }}"
+
+- name: create passbolt backup script
+  template:
+    src: templates/passbolt-backup.sh.j2
+    dest: "{{ passbolt_backup_bin }}"
+    group: root
+    owner: root
+    mode: 0750
+  vars:
+    backup_path: "{{ passbolt_backup_target }}"
+    backup_db: "{{ passbolt_db_name }}"
+    backup_db_user: "{{ passbolt_db_user }}"
+    backup_db_pass: "{{ passbolt_db_pass }}"
+    backup_identifier: "passbolt-{{ inventory_hostname }}"
+    backup_replica: "{{ passbolt_slave }}"
+    passbolt_config: "{{ _passbolt_config_file }}"
+    retention_period: "{{ passbolt_retention_backup }}"
+
+- name: create passbolt restore script
+  template:
+    src: templates/passbolt-restore.sh.j2
+    dest: "{{ passbolt_restore_bin }}"
+    group: root
+    owner: root
+    mode: 0750
+  vars:
+    backup_path: "{{ passbolt_backup_target }}"
+    backup_db_user: "{{ passbolt_db_user }}"
+    backup_db_pass: "{{ passbolt_db_pass }}"
+    backup_identifier: "passbolt-{{ inventory_hostname }}"
+
+- name: manage passbolt backup cronjob
+  cron:
+    name: passbolt-conf-backup
+    job: "{{ passbolt_backup_bin }}"
+    special_time: daily
+  when: passbolt_backup | default(True)
+
+- name: create passbolt backup motd pointers
+  copy:
+    dest: /etc/update-motd.d/99-passbolt
+    content: |
+      #!/usr/bin/env bash
+      echo
+      echo run passbolt-backup to manually force passbolt backup creation
+      echo run passbolt-restore to manually restore latest passbolt backup
+      echo
+    mode: 0755

@@ -1,0 +1,25 @@
+---
+- name: backup and restore
+
+  hosts: all
+
+  become: yes
+
+  tasks:
+
+    - name: verify frontpage content
+      uri:
+        url: http://localhost
+        status_code: 200
+      register: _frontpage_content
+      until: _frontpage_content is not failed
+      retries: 12
+      delay: 15
+
+    - name: create passbolt directories
+      file:
+        path: /backups
+        state: directory
+
+    - name: take passbolt backup
+      command: /usr/local/bin/passbolt-backup
