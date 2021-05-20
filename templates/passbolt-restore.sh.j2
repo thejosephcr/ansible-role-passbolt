@@ -21,7 +21,7 @@ if [ $rst_option == 'Yes' ];
     fi
     if [ $rst_origin == 'Slave' ];
       then
-        origin_file=passbolt-{{ passbolt_slave }};
+        origin_file=passbolt-{{ _passbolt_slave }};
     fi
 
     if [ -n '$origin_file' ];

@@ -132,6 +132,10 @@
     path: "{{ passbolt_backup_target }}"
     state: directory
 
+- name: define passbolt_slave
+  set_fact:
+    _passbolt_slave: "{{ passbolt_slave | default(ansible_hostname) }}"
+
 - name: create passbolt backup script
   template:
     src: templates/passbolt-backup.sh.j2
@@ -145,7 +149,7 @@
     backup_db_user: "{{ passbolt_db_user }}"
     backup_db_pass: "{{ passbolt_db_pass }}"
     backup_identifier: "passbolt-{{ inventory_hostname }}"
-    backup_replica: "{{ passbolt_slave }}"
+    backup_replica: "{{ _passbolt_slave }}"
     passbolt_config: "{{ _passbolt_config_file }}"
     retention_period: "{{ passbolt_retention_backup }}"
 
@@ -179,3 +183,68 @@
       echo run passbolt-restore to manually restore latest passbolt backup
       echo
     mode: 0755
+
+- block:
+
+    - name: create replication group
+      group:
+        name: "{{ passbolt_user_replication }}"
+        state: present
+
+    - name: create replication user in master
+      user:
+        name: "{{ passbolt_user_replication }}"
+        groups: "{{ passbolt_user_replication }}"
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/passbolt
+      delegate_to: passbolt_master
+
+    - name: configure ssh config for replica access
+      template:
+        src: templates/ssh_config.j2
+        dest: "{{ ssh_path }}/config"
+        mode: 0600
+      vars:
+        ssh_path: "/home/{{ passbolt_user_replication }}/.ssh"
+        ssh_key_filename: passbolt
+        ssh_replica_user: "{{ passbolt_user_replication }}"
+        ssh_replica_host: "{{ passbolt_slave }}"
+      become_user: "{{ passbolt_user_replication }}"
+      delegate_to: passbolt_master
+      tags:
+        - replica
+
+    - name: create ssh public key path fact
+      set_fact:
+        _passbolt_ssh_public_key: "/home/{{ passbolt_user_replication }}/.ssh/passbolt.pub"
+
+    - name: check if ssh key exists
+      stat:
+        path: "{{ _passbolt_ssh_public_key }}"
+      register: passbolt_ssh_key
+
+    - name: read ssh public key
+      set_fact:
+        _passbolt_ssh_public_key: "{{ item }}"
+      with_file:
+        - "{{ _passbolt_ssh_public_key }}"
+      delegate_to: passbolt_master
+      when: passbolt_ssh_key.stat.exists
+
+    - name: create replication user in slave
+      user:
+        name: "{{ passbolt_user_replication }}"
+        groups: "{{ passbolt_user_replication }}"
+      delegate_to: passbolt_slave
+
+    - name: configure ssh public key for rsync use
+      ansible.posix.authorized_key:
+        user: "{{ passbolt_user_replication }}"
+        state: present
+        key: "{{ _passbolt_ssh_public_key }}"
+      delegate_to: passbolt_slave
+      tags:
+        - replica
+
+  when: passbolt_slave is defined

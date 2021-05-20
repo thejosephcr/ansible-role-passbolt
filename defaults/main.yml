@@ -41,11 +41,11 @@ passbolt_backup_bin: /usr/local/bin/passbolt-backup
 passbolt_restore_bin: /usr/local/bin/passbolt-restore
 passbolt_retention_backup: 5
 # Only with replication
-passbolt_user_replication: ""
+passbolt_user_replication: "replica"
 
 passbolt_master: "{{ ansible_hostname }}"
 # secondary server, rsync backups from master
-passbolt_slave: "{{ ansible_hostname }}"
+# passbolt_slave: "{{ ansible_hostname }}"
 
 passbolt_user: www-data
 passbolt_group: www-data
