@@ -43,7 +43,7 @@ jobs:
       matrix:
         image:
           - ubuntu2004
-          - centos7
+          - ubuntu1804
     steps:
       - name: check out the codebase.
         uses: actions/checkout@v2
