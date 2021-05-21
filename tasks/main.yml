@@ -109,7 +109,7 @@
     - restart php-fpm
 
 - name: install passbolt
-  shell: "{{ passbolt_bin_path }}/cake passbolt install --quiet --no-admin"
+  command: "{{ passbolt_bin_path }}/cake passbolt install --quiet --no-admin"
   become_user: "{{ passbolt_user }}"
   changed_when: false
   failed_when: false
