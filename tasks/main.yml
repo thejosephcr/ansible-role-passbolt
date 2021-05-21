@@ -1,4 +1,50 @@
 ---
+- name: set variable overrides
+  set_fact:
+    _passbolt_mysql_packages: "{{ passbolt_mysql_packages | default(passbolt_mysql_default_packages | sorted_get(overrides)) }}"
+    _passbolt_php_version: "{{ passbolt_php_version | default(passbolt_php_default_version | sorted_get(overrides)) }}"
+  vars:
+    overrides:
+      - "{{ ansible_distribution | lower }}-{{ ansible_distribution_release | lower }}"
+      - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
+      - "{{ ansible_distribution | lower }}"
+      - "{{ ansible_os_family | lower }}"
+      - "default"
+
+- name: set php packages
+  set_fact:
+    _passbolt_php_packages_extra: "{{ passbolt_php_packages | default(passbolt_php_packages_default) }}"
+
+- name: install nginx
+  include_role:
+    name: geerlingguy.nginx
+  vars:
+    nginx_remove_default_vhost: true
+    nginx_vhosts: "{{ passbolt_nginx_vhosts }}"
+    nginx_user: "{{ passbolt_nginx_user }}"
+    nginx_group: "{{ passbolt_nginx_group }}"
+    nginx_conf_dir: "{{ passbolt_nginx_conf_dir }}"
+    nginx_certificate_hostname: "{{ passbolt_nginx_certificate_hostname }}"
+    nginx_certificate_chainfile: "{{ passbolt_nginx_certificate_chainfile }}"
+    nginx_certificate_keyfile: "{{ passbolt_nginx_certificate_keyfile }}"
+
+- name: install mysql
+  include_role:
+    name: geerlingguy.mysql
+  vars:
+    mysql_packages: "{{ _passbolt_mysql_packages }}"
+    mysql_root_user: "{{ passbolt_mysql_root_user }}"
+    mysql_root_password: "{{ passbolt_mysql_root_password }}"
+    mysql_databases: "{{ passbolt_mysql_databases }}"
+    mysql_users: "{{ passbolt_mysql_users }}"
+
+- name: install php
+  include_role:
+    name: geerlingguy.php
+  vars:
+    php_webserver_daemon: "{{ passbolt_php_webserver_daemon }}"
+    php_packages_extra: "{{ _passbolt_php_packages_extra }}"
+
 - name: install required packages
   package:
     name: "{{ passbolt_packages }}"
@@ -26,8 +72,8 @@
     version: "{{ passbolt_release }}"
     force: yes
   notify:
+    - restart php-fpm-version
     - restart nginx
-    - restart php-fpm
 
 - name: loading passbolt gpg keys
   copy:
@@ -93,7 +139,7 @@
     mode: 0750
   vars:
     base_url: "{{ passbolt_url }}"
-    db_host: localhost
+    db_host: "{{ passbolt_db_host }}"
     db_name: "{{ passbolt_db_name }}"
     db_user: "{{ passbolt_db_user }}"
     db_pass: "{{ passbolt_db_pass }}"
@@ -106,7 +152,7 @@
     privkey: "{{ passbolt_gpg_privkey }}"
     fingerprint: "{{ passbolt_gpg_fingerprint }}"
   notify:
-    - restart php-fpm
+    - restart php-fpm-version
 
 - name: install passbolt
   command: "{{ passbolt_bin_path }}/cake passbolt install --quiet --no-admin"

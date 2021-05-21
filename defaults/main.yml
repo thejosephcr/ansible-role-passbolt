@@ -2,19 +2,24 @@
 passbolt_packages:
   - composer
   - git
-passbolt_php_default_version_debian: "7.4"
+  - cron
+passbolt_php_default_version:
+  ubuntu-bionic: "7.2"
+  debian: "7.3"
+  redhat: "7.4"
+  default: ""
 passbolt_php_webserver_daemon: nginx
-passbolt_php_packages_extra:
-  - php{{ php_default_version_debian }}-mysql
-  - php{{ php_default_version_debian }}-intl
-  - php{{ php_default_version_debian }}-readline
-  - php{{ php_default_version_debian }}-imagick
-  - php{{ php_default_version_debian }}-gnupg
-  - php{{ php_default_version_debian }}-ldap
-  - php{{ php_default_version_debian }}-bz2
-  - php{{ php_default_version_debian }}-zip
-  - php{{ php_default_version_debian }}-gmp
-  - php{{ php_default_version_debian }}-xsl
+passbolt_php_packages_default:
+  - php{{ _passbolt_php_version }}-mysql
+  - php{{ _passbolt_php_version }}-intl
+  - php{{ _passbolt_php_version }}-readline
+  - php{{ _passbolt_php_version }}-imagick
+  - php{{ _passbolt_php_version }}-gnupg
+  - php{{ _passbolt_php_version }}-ldap
+  - php{{ _passbolt_php_version }}-bz2
+  - php{{ _passbolt_php_version }}-zip
+  - php{{ _passbolt_php_version }}-gmp
+  - php{{ _passbolt_php_version }}-xsl
 
 passbolt_nfs_server: no
 
@@ -48,11 +53,17 @@ passbolt_db_root_pass: ChangeMe.01!
 passbolt_db_name: passbolt
 passbolt_db_user: passbolt
 passbolt_db_pass: ChangeMe.01!
+passbolt_db_host: "localhost"
 passbolt_mysql_root_user: "{{ passbolt_db_root_user }}"
 passbolt_mysql_root_password: "{{ passbolt_db_root_pass }}"
-passbolt_mysql_packages:
-  - mariadb-server
-  - mariadb-client
+passbolt_mysql_default_packages:
+  debian:
+    - mariadb-server
+    - mariadb-client
+  redhat:
+    - mariadb-server
+    - mariadb
+  default: []
 passbolt_mysql_databases:
   - name: "{{ passbolt_db_name }}"
     encoding: utf8mb4
@@ -210,7 +221,7 @@ passbolt_nginx_vhost_extra: |
     }
     location ~ \.php$ {
         include /etc/nginx/fastcgi_params;
-        fastcgi_pass  unix:/var/run/php/php{{ passbolt_php_default_version_debian }}-fpm.sock;
+        fastcgi_pass  unix:/var/run/php/php{{ _passbolt_php_version }}-fpm.sock;
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;

@@ -1,12 +1,6 @@
 ---
-- name: restart nginx
+- name: restart php-fpm-version
   service:
-    name: nginx
-    state: restarted
-    enabled: yes
-
-- name: restart php-fpm
-  service:
-    name: "php{{ passbolt_php_default_version_debian }}-fpm"
+    name: "php{{ _passbolt_php_version }}-fpm"
     state: restarted
     enabled: yes

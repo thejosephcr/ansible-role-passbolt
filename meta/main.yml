@@ -16,22 +16,8 @@ dependencies:
     vars:
       nfs_server: "{{ passbolt_nfs_server }}"
   - role: geerlingguy.nginx
-    vars:
-      nginx_vhosts: "{{ passbolt_nginx_vhosts }}"
-      nginx_user: "{{ passbolt_nginx_user }}"
-      nginx_group: "{{ passbolt_nginx_group }}"
-      nginx_conf_dir: "{{ passbolt_nginx_conf_dir }}"
-      nginx_certificate_hostname: "{{ passbolt_nginx_certificate_hostname }}"
-      nginx_certificate_chainfile: "{{ passbolt_nginx_certificate_chainfile }}"
-      nginx_certificate_keyfile: "{{ passbolt_nginx_certificate_keyfile }}"
+    when: false
   - role: geerlingguy.mysql
-    vars:
-      mysql_packages: "{{ passbolt_mysql_packages }}"
-      mysql_root_user: "{{ passbolt_mysql_root_user }}"
-      mysql_root_password: "{{ passbolt_mysql_root_password }}"
-      mysql_databases: "{{ passbolt_mysql_databases }}"
-      mysql_users: "{{ passbolt_mysql_users }}"
+    when: false
   - role: geerlingguy.php
-    vars:
-      php_webserver_daemon: "{{ passbolt_php_webserver_daemon }}"
-      php_packages_extra: "{{ passbolt_php_packages_extra }}"
+    when: false
