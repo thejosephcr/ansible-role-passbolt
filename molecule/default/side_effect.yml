@@ -9,7 +9,7 @@
 
     - name: verify frontpage content
       uri:
-        url: http://localhost
+        url: http://localhost/auth/login
         status_code: 200
       register: _frontpage_content
       until: _frontpage_content is not failed

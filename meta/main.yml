@@ -18,6 +18,12 @@ dependencies:
   - role: geerlingguy.nginx
     vars:
       nginx_vhosts: "{{ passbolt_nginx_vhosts }}"
+      nginx_user: "{{ passbolt_nginx_user }}"
+      nginx_group: "{{ passbolt_nginx_group }}"
+      nginx_conf_dir: "{{ passbolt_nginx_conf_dir }}"
+      nginx_certificate_hostname: "{{ passbolt_nginx_certificate_hostname }}"
+      nginx_certificate_chainfile: "{{ passbolt_nginx_certificate_chainfile }}"
+      nginx_certificate_keyfile: "{{ passbolt_nginx_certificate_keyfile }}"
   - role: geerlingguy.mysql
     vars:
       mysql_packages: "{{ passbolt_mysql_packages }}"

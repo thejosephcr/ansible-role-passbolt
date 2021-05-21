@@ -27,6 +27,7 @@
     force: yes
   notify:
     - restart nginx
+    - restart php-fpm
 
 - name: loading passbolt gpg keys
   copy:
@@ -104,6 +105,12 @@
     pubkey: "{{ passbolt_gpg_pubkey }}"
     privkey: "{{ passbolt_gpg_privkey }}"
     fingerprint: "{{ passbolt_gpg_fingerprint }}"
+  notify:
+    - restart php-fpm
+
+- name: install passbolt
+  shell: "{{ passbolt_bin_path }}/cake passbolt install --quiet --no-admin"
+  become_user: "{{ passbolt_user }}"
 
 - name: create passbolt log file
   file:
