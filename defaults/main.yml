@@ -5,7 +5,8 @@ passbolt_packages:
   - cron
 passbolt_php_default_version:
   ubuntu-bionic: "7.2"
-  debian: "7.3"
+  debian-10: "7.3"
+  debian: "7.4"
   redhat: "7.4"
   default: ""
 passbolt_php_webserver_daemon: nginx
