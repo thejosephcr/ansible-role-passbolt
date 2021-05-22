@@ -30,7 +30,6 @@ passbolt_host: "{{ passbolt_url | urlsplit('hostname') }}"
 
 passbolt_log_file: /var/log/passbolt.log
 passbolt_web_root: /var/www
-passbolt_bin_path: "{{ passbolt_web_root }}/passbolt/bin"
 # email server and port
 passbolt_smtp_host: 1.1.1.1
 passbolt_smtp_port: 25
@@ -202,6 +201,7 @@ passbolt_gpg_privkey_secret: |
 
 passbolt_hostname: "{{ passbolt_url | urlsplit('hostname') }}"
 passbolt_root: "{{ passbolt_web_root }}/passbolt"
+passbolt_bin_path: "{{ passbolt_root }}/bin"
 passbolt_gpg_privkey: "{{ passbolt_web_root }}/config/gpg/private.key"
 passbolt_gpg_pubkey: "{{ passbolt_web_root }}/config/gpg/public.key"
 passbolt_gpg_keyring: "{{ passbolt_web_root }}/.gnupg"

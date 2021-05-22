@@ -156,9 +156,9 @@
 
 - name: install passbolt
   command: "{{ passbolt_bin_path }}/cake passbolt install --quiet --no-admin"
+  args:
+    creates: "{{ passbolt_root }}/logs/cli-debug.log"
   become_user: "{{ passbolt_user }}"
-  changed_when: false
-  failed_when: false
 
 - name: create passbolt log file
   file:
