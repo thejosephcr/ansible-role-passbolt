@@ -198,7 +198,10 @@
 
 - name: define passbolt_slave
   set_fact:
-    _passbolt_slave: "{{ passbolt_slave | default(ansible_hostname) }}"
+    _passbolt_slave: "{{ passbolt_slave | default(inventory_hostname) }}"
+  tags:
+    - restore
+    - backup
 
 - name: create passbolt backup script
   template:
@@ -216,6 +219,8 @@
     backup_replica: "{{ _passbolt_slave }}"
     passbolt_config: "{{ _passbolt_config_file }}"
     retention_period: "{{ passbolt_retention_backup }}"
+  tags:
+    - backup
 
 - name: create passbolt restore script
   template:
@@ -229,6 +234,8 @@
     backup_db_user: "{{ passbolt_db_user }}"
     backup_db_pass: "{{ passbolt_db_pass }}"
     backup_identifier: "passbolt-{{ inventory_hostname }}"
+  tags:
+    - restore
 
 - name: manage passbolt backup cronjob
   cron:
@@ -236,6 +243,9 @@
     job: "{{ passbolt_backup_bin }}"
     special_time: daily
   when: passbolt_backup | default(True)
+  tags:
+    - restore
+    - backup
 
 - name: create passbolt backup motd pointers
   copy:

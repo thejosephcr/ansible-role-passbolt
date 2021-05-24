@@ -17,9 +17,8 @@ if [ $rst_option == 'Yes' ];
 
     if [ $rst_origin == 'Master' ];
       then
-        origin_file=passbolt-{{ passbolt_master }};
-    fi
-    if [ $rst_origin == 'Slave' ];
+        origin_file={{ backup_identifier }};
+    elif [ $rst_origin == 'Slave' ];
       then
         origin_file=passbolt-{{ _passbolt_slave }};
     fi
@@ -46,10 +45,11 @@ if [ $rst_option == 'Yes' ];
             mysqldump=$(tar tzf $latest_backup | grep mysqldump)
             mysql < /$mysqldump
 
-            sudo su -s /bin/bash -c "{{ passbolt_root }}/bin/cake passbolt cleanup" {{ passbolt_user }}
+            sudo su -s /bin/bash -c "{{ passbolt_bin_path }}/cake passbolt cleanup" {{ passbolt_user }}
 
             # start services
             systemctl start nginx
+            sudo su -s /bin/bash -c "{{ passbolt_bin_path }}/cake passbolt healthcheck" {{ passbolt_user }}
           else
             echo -e "File not found"
         fi
