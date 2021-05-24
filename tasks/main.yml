@@ -147,6 +147,7 @@
     email_user: "{{ passbolt_email_user }}"
     email_host: "{{ passbolt_smtp_host }}"
     email_port: "{{ passbolt_smtp_port }}"
+    email_tls_enabled: "{{ passbolt_smtp_tls_enabled }}"
     keyring: "{{ passbolt_gpg_keyring }}"
     pubkey: "{{ passbolt_gpg_pubkey }}"
     privkey: "{{ passbolt_gpg_privkey }}"
@@ -158,6 +159,14 @@
   command: "{{ passbolt_bin_path }}/cake passbolt install --quiet --no-admin"
   args:
     creates: "{{ passbolt_root }}/logs/cli-debug.log"
+  become_user: "{{ passbolt_user }}"
+
+- name: register passbolt admin
+  command: |
+    {{ passbolt_bin_path }}/cake passbolt register_user -u {{ passbolt_gpg_email }} \
+    -f {{ passbolt_admin_name }} -l {{ passbolt_admin_lastname }} -r {{ passbolt_admin_role }}
+  failed_when: false
+  changed_when: false
   become_user: "{{ passbolt_user }}"
 
 - name: create passbolt log file
@@ -303,3 +312,17 @@
         - replica
 
   when: passbolt_slave is defined
+
+- name: force all notified handlers to run
+  meta: flush_handlers
+
+- name: verify passbolt status before
+  command: "{{ passbolt_bin_path }}/cake passbolt healthcheck"
+  become_user: "{{ passbolt_user }}"
+  register: _passbolt_healthcheck_result
+  changed_when: False
+
+- name: debug passbolt healthcheck result
+  debug:
+    var: _passbolt_healthcheck_result.stdout_lines
+  changed_when: False

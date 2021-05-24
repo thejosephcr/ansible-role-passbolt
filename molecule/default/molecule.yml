@@ -16,6 +16,11 @@ provisioner:
   log: true
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-converge.yml}
+  inventory:
+    group_vars:
+      all:
+        passbolt_bin_path: '/var/www/passbolt/bin/'
+        passbolt_user: 'www-data'
 scenario:
   name: default
 verifier:

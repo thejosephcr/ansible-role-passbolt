@@ -9,12 +9,21 @@
 
     - name: verify frontpage content
       uri:
-        url: http://localhost/auth/login
+        url: http://localhost/
         status_code: 200
       register: _frontpage_content
       until: _frontpage_content is not failed
       retries: 12
       delay: 15
+
+    - name: verify passbolt status before backup
+      command: "{{ passbolt_bin_path }}/cake passbolt healthcheck"
+      become_user: "{{ passbolt_user }}"
+      register: _passbolt_healthcheck_result
+
+    - name: debug passbolt healthcheck result
+      debug:
+        var: _passbolt_healthcheck_result.stdout_lines
 
     - name: take passbolt backup
       command: /usr/local/bin/passbolt-backup

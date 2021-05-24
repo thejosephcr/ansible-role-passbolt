@@ -63,7 +63,7 @@ return [
             'host' => '{{ email_host }}',
             'port' => {{ email_port }},
             // Is this a secure connection? true if yes, null if no.
-            'tls' => false,
+            'tls' => {{ passbolt_smtp_tls_enabled }},
             //'timeout' => 30,
             //'client' => null,
         ],
