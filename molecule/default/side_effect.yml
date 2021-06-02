@@ -27,3 +27,43 @@
 
     - name: take passbolt backup
       command: /usr/local/bin/passbolt-backup
+      register: _backup_script
+      until: _backup_script is not failed
+      retries: 5
+      delay: 5
+
+    - name: kill mysql connections
+      command: |
+        mysql -u {{ passbolt_db_user }} -D {{ passbolt_db_name }} -p{{ passbolt_db_pass }}
+        -e "select concat('KILL ',id,';') from information_schema.processlist"
+
+    - name: drop passbolt database
+      command: |
+        mysql -u {{ passbolt_db_user }} -D {{ passbolt_db_name }} -p{{ passbolt_db_pass }}
+        -e "drop database {{ passbolt_db_name }};"
+
+    - name: verify passbolt status after dropping database
+      command: "{{ passbolt_bin_path }}/cake passbolt healthcheck"
+      become_user: "{{ passbolt_user }}"
+      failed_when: false
+      register: _passbolt_healthcheck_result
+
+    - name: debug passbolt healthcheck result
+      debug:
+        var: _passbolt_healthcheck_result.stdout_lines
+
+    - name: perform passbolt restore
+      command: /usr/local/bin/passbolt-restore master
+      register: _restore_script
+      until: _restore_script is not failed
+      retries: 5
+      delay: 5
+
+    - name: verify passbolt status after restore
+      command: "{{ passbolt_bin_path }}/cake passbolt healthcheck"
+      become_user: "{{ passbolt_user }}"
+      register: _passbolt_healthcheck_result
+
+    - name: debug passbolt healthcheck result
+      debug:
+        var: _passbolt_healthcheck_result.stdout_lines

@@ -19,8 +19,11 @@ provisioner:
   inventory:
     group_vars:
       all:
-        passbolt_bin_path: '/var/www/passbolt/bin/'
+        passbolt_bin_path: '/var/www/passbolt/bin'
         passbolt_user: 'www-data'
+        passbolt_db_name: passbolt
+        passbolt_db_user: passbolt
+        passbolt_db_pass: ChangeMe.01!
 scenario:
   name: default
 verifier:
