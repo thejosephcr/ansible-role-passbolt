@@ -42,6 +42,7 @@ passbolt_restore_bin: /usr/local/bin/passbolt-restore
 passbolt_retention_backup: 5
 # Only with replication
 passbolt_user_replication: "replica"
+passbolt_user_repl_password: ChangeMe.01!
 
 passbolt_master: "{{ ansible_hostname }}"
 # secondary server, rsync backups from master
@@ -202,6 +203,41 @@ passbolt_gpg_privkey_secret: |
   lLEWorAg1onCTIqFI+j+OMPPKvcJylqbf7NwGmYmslhtyevDk7+lD8lphvQ=
   =tjND
   -----END PGP PRIVATE KEY BLOCK-----
+
+passbolt_repl_ssh_priv_key: |
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+  NhAAAAAwEAAQAAAQEA6EtiMoChKvjnUkfTEWyHFbwMunZGF0kMVnV6WsTseJZsM8j2/TTP
+  jKjp1t6KGJfX8MdCJsBdeOboYfdbz0LVQ20JyDlHnfk+0W68l0Zbq5N11S/Q6lkqDfaZyb
+  iggSx5gJnr7M3cjwJzzwVh8+AOR/MAq6OQPDKv3l/deqVSkYSjLoAQPZGj0ub7VO4ga6x3
+  NoKXg06ApFZZ5iZ5s8gG9S0i9W2IbYtejiV2AucSipKuRNbCG9Tbhg2EXXgrswNNRokNzO
+  pe/7qtEhdWIb9x4VjV7vP9zn8yJpklOuHsPYalkUawDQ9M+TNzeQVH2vABnaudlFBJYp8C
+  nffBJ+gGkwAAA8jAnZ2GwJ2dhgAAAAdzc2gtcnNhAAABAQDoS2IygKEq+OdSR9MRbIcVvA
+  y6dkYXSQxWdXpaxOx4lmwzyPb9NM+MqOnW3ooYl9fwx0ImwF145uhh91vPQtVDbQnIOUed
+  +T7RbryXRlurk3XVL9DqWSoN9pnJuKCBLHmAmevszdyPAnPPBWHz4A5H8wCro5A8Mq/eX9
+  16pVKRhKMugBA9kaPS5vtU7iBrrHc2gpeDToCkVlnmJnmzyAb1LSL1bYhti16OJXYC5xKK
+  kq5E1sIb1NuGDYRdeCuzA01GiQ3M6l7/uq0SF1Yhv3HhWNXu8/3OfzImmSU64ew9hqWRRr
+  AND0z5M3N5BUfa8AGdq52UUElinwKd98En6AaTAAAAAwEAAQAAAQEAyKclIX6euOHb3uUP
+  2wMmBI41aHN1w/NjZuN/Vxy3LsqwmGLFhp6xkUzvAJ2mJ+wxqVhVOef8Vc0PemASvAt88A
+  sl4gAobrq3mmzPFtS9po1vwUDWczel7f3PhcGnUy05nu5WLmz8UcPKiU6a9+/YJiovsBNP
+  KdCWvb2NML3RfsOwbh08SrYfhulIzVqYdAGrJYEP8RZyyPnLDmVPe+cNbEI24/aRPyKIey
+  XIW06mrFYMb2hclQWHYQ1oIxsLelD9iCyi7j4k+GLDEVeflbMin6Q+6rvbfmEzP1hW7oGY
+  5J5LJa46tuLBEZq/B4H7r/c3p0dSLeRioZkAwDZ+hchocQAAAIB30fqHehof8WKPeZ7O64
+  4A0sR/caW5kQ7ZxbB/48uSk+h1da898mlSYTE0Ds84LVFX61feZF9bDuUZJs3Nv3Vc3bAd
+  m442TAIaviNUm6D/bH4DZFu8PkZrf3jDw5WHwm7hUnPip8MUFxDCJnSWezRg24ztaA1MGx
+  ueXMLLAnakQwAAAIEA9Ibv1kx73hvhHSrDS1OkW36DCEAndpUPy9IczicNo3XpTRIR5rwL
+  LS6vWyMEEgHgsdM0Iso3QCMMjdZzsOITB71Bc2gNEdZjqYy+bXTxcU8iQMdE1r3aSBPrz4
+  eCq2tsVHJnuzT2Mm8jDRAaxFG9HYPZyISurjJ5UzxDSgGuP7UAAACBAPMxhKgjYPTy5t15
+  djVzFJoy0ceZTE1znrNy2RD+nKm4ceb0OBKmQneMovnnLAIRKXn2s3QyvN8XC70MXvTomK
+  /bMYn5fDbIjHDuBfom2IKiXxuYPMuCEz0m21wzIUi7yPkg2r1u+BU/KzIPX17MTb7RXr7a
+  CoAE2oZqEwnrakonAAAAEHVidW50dUBjZy11YnVudHUBAg==
+  -----END OPENSSH PRIVATE KEY-----
+passbolt_repl_ssh_public_key: |
+  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDoS2IygKEq+OdSR9MRbIcVvAy6dkYXSQxWdXpaxOx4lmwzyPb9NM+MqOnW3ooYl9fwx0ImwF145uhh91vPQtVDbQnIOUed+T7RbryXRlurk3XVL9DqWSoN9pnJuKCBLHmAmevszdyPAnPPBWHz4A5H8wCro5A8Mq/eX916pVKRhKMugBA9kaPS5vtU7iBrrHc2gpeDToCkVlnmJnmzyAb1LSL1bYhti16OJXYC5xKKkq5E1sIb1NuGDYRdeCuzA01GiQ3M6l7/uq0SF1Yhv3HhWNXu8/3OfzImmSU64ew9hqWRRrAND0z5M3N5BUfa8AGdq52UUElinwKd98En6AaT ubuntu@cg-ubuntu
+
+passbolt_ssh_path: "/home/{{ passbolt_user_replication }}/.ssh"
+passbolt_ssh_key_filename: "passbolt"
+passbolt_ssh_repl_key_path: "{{ passbolt_ssh_path }}/{{ passbolt_ssh_key_filename }}"
 
 passbolt_hostname: "{{ passbolt_url | urlsplit('hostname') }}"
 passbolt_root: "{{ passbolt_web_root }}/passbolt"

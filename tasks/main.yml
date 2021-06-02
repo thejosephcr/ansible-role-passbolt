@@ -254,7 +254,8 @@
       #!/usr/bin/env bash
       echo
       echo run passbolt-backup to manually force passbolt backup creation
-      echo run passbolt-restore to manually restore latest passbolt backup
+      echo run passbolt-restore and follow instructions to manually restore latest passbolt backup
+      echo run passbolt-restore <master or slave> to manually restore latest passbolt backup
       echo
     mode: 0755
 
@@ -264,15 +265,53 @@
       group:
         name: "{{ passbolt_user_replication }}"
         state: present
+      tags:
+        - replica
 
-    - name: create replication user in master
+    - name: create replication user
       user:
         name: "{{ passbolt_user_replication }}"
-        groups: "{{ passbolt_user_replication }}"
-        generate_ssh_key: yes
-        ssh_key_bits: 2048
-        ssh_key_file: .ssh/passbolt
+        password: "{{ passbolt_user_repl_password }} | password_hash('sha512')"
+        group: "{{ passbolt_user_replication }}"
+        update_password: on_create
+      tags:
+        - replica
+
+    - name: permissions applied to user folder
+      file:
+        path: "/home/{{ passbolt_user_replication }}"
+        recurse: yes
+        owner: "{{ passbolt_user_replication }}"
+        group: "{{ passbolt_user_replication }}"
+      tags:
+        - replica
+
+    - name: configure ssh private and public keys for rsync use
+      copy:
+        dest: "{{ item.path }}"
+        content: |
+          {{ item.key | default('Empty') }}
+        mode: "{{ item.mode }}"
+      loop:
+        - key: "{{ ssh_priv_key }}"
+          path: "{{ ssh_path }}"
+          mode: '600'
+        - key: "{{ ssh_public_key }}"
+          path: "{{ ssh_path }}.pub"
+          mode: '755'
+      loop_control:
+        label: "{{ item.path }}"
+      vars:
+        ssh_key_filename: "{{ passbolt_ssh_key_filename }}"
+        ssh_path: "{{ passbolt_ssh_path }}/{{ ssh_key_filename }}"
+        ssh_priv_key: "{{ passbolt_repl_ssh_priv_key }}"
+        ssh_public_key: "{{ passbolt_repl_ssh_public_key }}"
+        ssh_priv_key_path: "{{ passbolt_ssh_repl_key_path }}"
       delegate_to: passbolt_master
+      become_user: "{{ passbolt_user_replication }}"
+      run_once: yes
+      tags:
+        - replica
 
     - name: configure ssh config for replica access
       template:
@@ -280,44 +319,48 @@
         dest: "{{ ssh_path }}/config"
         mode: 0600
       vars:
-        ssh_path: "/home/{{ passbolt_user_replication }}/.ssh"
-        ssh_key_filename: passbolt
+        ssh_path: "{{ passbolt_ssh_path }}"
+        ssh_key_filename: "{{ passbolt_ssh_key_filename }}"
         ssh_replica_user: "{{ passbolt_user_replication }}"
         ssh_replica_host: "{{ passbolt_slave }}"
-      become_user: "{{ passbolt_user_replication }}"
       delegate_to: passbolt_master
+      run_once: yes
       tags:
         - replica
 
-    - name: create ssh public key path fact
-      set_fact:
-        _passbolt_ssh_public_key: "/home/{{ passbolt_user_replication }}/.ssh/passbolt.pub"
 
-    - name: check if ssh key exists
-      stat:
-        path: "{{ _passbolt_ssh_public_key }}"
-      register: passbolt_ssh_key
-
-    - name: read ssh public key
-      set_fact:
-        _passbolt_ssh_public_key: "{{ item }}"
-      with_file:
-        - "{{ _passbolt_ssh_public_key }}"
-      delegate_to: passbolt_master
-      when: passbolt_ssh_key.stat.exists
-
-    - name: create replication user in slave
-      user:
-        name: "{{ passbolt_user_replication }}"
-        groups: "{{ passbolt_user_replication }}"
+    - name: configure ssh public key for rsync use
+      copy:
+        dest: "{{ item.path }}"
+        content: |
+          {{ item.key | default('Empty') }}
+        mode: "{{ item.mode }}"
+      loop:
+        - key: "{{ ssh_public_key }}"
+          path: "{{ ssh_path }}.pub"
+          mode: '755'
+      loop_control:
+        label: "{{ item.path }}"
+      vars:
+        ssh_key_filename: "{{ passbolt_ssh_key_filename }}"
+        ssh_path: "{{ passbolt_ssh_path }}/{{ ssh_key_filename }}"
+        ssh_priv_key: "{{ passbolt_repl_ssh_priv_key }}"
+        ssh_public_key: "{{ passbolt_repl_ssh_public_key }}"
+        ssh_priv_key_path: "{{ passbolt_ssh_repl_key_path }}"
       delegate_to: passbolt_slave
+      become_user: "{{ passbolt_user_replication }}"
+      run_once: yes
+      tags:
+        - replica
 
     - name: configure ssh public key for rsync use
       ansible.posix.authorized_key:
         user: "{{ passbolt_user_replication }}"
         state: present
-        key: "{{ _passbolt_ssh_public_key }}"
+        key: "{{ passbolt_repl_ssh_public_key }}"
       delegate_to: passbolt_slave
+      become_user: "{{ passbolt_user_replication }}"
+      run_once: yes
       tags:
         - replica
 
