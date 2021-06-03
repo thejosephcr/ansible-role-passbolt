@@ -24,7 +24,7 @@ passbolt_php_packages_default:
 
 passbolt_nfs_server: no
 
-passbolt_release: v3.1.0
+passbolt_release: v3.2.0
 passbolt_url: "http://localhost"
 passbolt_host: "{{ passbolt_url | urlsplit('hostname') }}"
 
@@ -51,6 +51,7 @@ passbolt_master: "{{ ansible_hostname }}"
 passbolt_admin_name: "{{ passbolt_email_user }}"
 passbolt_admin_lastname: "{{ passbolt_email_user }}"
 passbolt_admin_role: "admin"
+passbolt_admin_username: "{{ passbolt_gpg_email }}"
 passbolt_user: www-data
 passbolt_group: www-data
 passbolt_db_root_user: root
