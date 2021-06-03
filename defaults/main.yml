@@ -24,7 +24,7 @@ passbolt_php_packages_default:
 
 passbolt_nfs_server: no
 
-passbolt_release: v3.2.0
+passbolt_release: v3.1.0
 passbolt_url: "http://localhost"
 passbolt_host: "{{ passbolt_url | urlsplit('hostname') }}"
 
