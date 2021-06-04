@@ -1,7 +1,7 @@
 # ansible-role-passbolt
 
 [![Build Status](https://github.com/wpnops/ansible-role-passbolt/workflows/CI/badge.svg)](https://github.com/wpnops/ansible-role-passbolt/actions)
-[![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-wpnops.passbolt.vim-blue.svg)](https://galaxy.ansible.com/wpnops/passbolt/)
+[![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-wpnops.passbolt.vim-blue.svg)](https://galaxy.ansible.com/wpninfra/passbolt/)
 
 An [ansible role](https://galaxy.ansible.com/wpnops/passbolt) to install and configure ansible-role-passbolt
 
