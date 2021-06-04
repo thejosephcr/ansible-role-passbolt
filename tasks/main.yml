@@ -157,10 +157,18 @@
 
 - name: install passbolt
   command: |
-    {{ passbolt_bin_path }}/cake passbolt install --admin-first-name {{ passbolt_admin_name }} \
+    {{ passbolt_bin_path }}/cake passbolt install --admin-first-name {{ passbolt_admin_name }}
     --admin-last-name {{ passbolt_admin_lastname }} --admin-username {{ passbolt_admin_username }}
+    --verbose
   args:
-    creates: "{{ passbolt_root }}/logs/*.log"
+    creates: "{{ passbolt_root }}/logs/install.log"
+  become_user: "{{ passbolt_user }}"
+  register: passbolt_install_result
+
+- name: save passbolt install output
+  copy:
+    content: passbolt_install_result.stdout
+    dest: "{{ passbolt_root }}/logs/install.log"
   become_user: "{{ passbolt_user }}"
 
 - name: create passbolt log file
@@ -363,7 +371,7 @@
 - name: force all notified handlers to run
   meta: flush_handlers
 
-- name: verify passbolt status before
+- name: verify passbolt status
   command: "{{ passbolt_bin_path }}/cake passbolt healthcheck"
   become_user: "{{ passbolt_user }}"
   register: _passbolt_healthcheck_result
