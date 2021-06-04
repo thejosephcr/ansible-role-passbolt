@@ -18,8 +18,7 @@ By default this role does depend on someone external roles. If any such dependen
 ```
 - hosts: servers
   roles:
-     - role: wpnops.ansible-role-passbolt
-       ansible_role_passbolt_package_state: latest
+     - role: wpnops.passbolt
 ```
 
 ## Testing
