@@ -27,6 +27,7 @@
     nginx_certificate_hostname: "{{ passbolt_nginx_certificate_hostname }}"
     nginx_certificate_chainfile: "{{ passbolt_nginx_certificate_chainfile }}"
     nginx_certificate_keyfile: "{{ passbolt_nginx_certificate_keyfile }}"
+  when: passbolt_nginx_install | default(True)
 
 - name: install mysql
   include_role:
@@ -273,7 +274,7 @@
     - name: create replication user
       user:
         name: "{{ passbolt_user_replication }}"
-        password: "{{ passbolt_user_repl_password }} | password_hash('sha512')"
+        password: "{{ passbolt_user_repl_password | password_hash('sha512')}}"
         group: "{{ passbolt_user_replication }}"
         update_password: on_create
       tags:
@@ -309,7 +310,7 @@
         ssh_priv_key: "{{ passbolt_repl_ssh_priv_key }}"
         ssh_public_key: "{{ passbolt_repl_ssh_public_key }}"
         ssh_priv_key_path: "{{ passbolt_ssh_repl_key_path }}"
-      delegate_to: passbolt_master
+      delegate_to: "{{ passbolt_master }}"
       become_user: "{{ passbolt_user_replication }}"
       run_once: yes
       tags:
@@ -325,11 +326,10 @@
         ssh_key_filename: "{{ passbolt_ssh_key_filename }}"
         ssh_replica_user: "{{ passbolt_user_replication }}"
         ssh_replica_host: "{{ passbolt_slave }}"
-      delegate_to: passbolt_master
+      delegate_to: "{{ passbolt_master }}"
       run_once: yes
       tags:
         - replica
-
 
     - name: configure ssh public key for rsync use
       copy:
@@ -346,10 +346,8 @@
       vars:
         ssh_key_filename: "{{ passbolt_ssh_key_filename }}"
         ssh_path: "{{ passbolt_ssh_path }}/{{ ssh_key_filename }}"
-        ssh_priv_key: "{{ passbolt_repl_ssh_priv_key }}"
         ssh_public_key: "{{ passbolt_repl_ssh_public_key }}"
-        ssh_priv_key_path: "{{ passbolt_ssh_repl_key_path }}"
-      delegate_to: passbolt_slave
+      delegate_to: "{{ passbolt_slave }}"
       become_user: "{{ passbolt_user_replication }}"
       run_once: yes
       tags:
@@ -360,7 +358,7 @@
         user: "{{ passbolt_user_replication }}"
         state: present
         key: "{{ passbolt_repl_ssh_public_key }}"
-      delegate_to: passbolt_slave
+      delegate_to: "{{ passbolt_slave }}"
       become_user: "{{ passbolt_user_replication }}"
       run_once: yes
       tags:
