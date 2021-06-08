@@ -274,7 +274,7 @@
     - name: create replication user
       user:
         name: "{{ passbolt_user_replication }}"
-        password: "{{ passbolt_user_repl_password | password_hash('sha512')}}"
+        password: "{{ passbolt_user_repl_password | password_hash('sha512') }}"
         group: "{{ passbolt_user_replication }}"
         update_password: on_create
       tags:
