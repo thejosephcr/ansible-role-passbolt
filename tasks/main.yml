@@ -73,6 +73,7 @@
     version: "{{ passbolt_release }}"
     force: yes
   notify:
+    - update passbolt
     - restart php-fpm-version
     - restart nginx
 

@@ -4,3 +4,36 @@
     name: "php{{ _passbolt_php_version }}-fpm"
     state: restarted
     enabled: yes
+
+- name: stop nginx
+  service:
+    name: nginx
+    state: stopped
+  listen: update passbolt
+
+- name: use composer to install dependencies
+  composer:
+    command: install
+    arguments: "-n -o"
+    working_dir: "{{ passbolt_root }}"
+    no_dev: yes
+  become_user: "{{ passbolt_user }}"
+  listen: update passbolt
+
+- name: update passbolt
+  command: |
+    {{ passbolt_bin_path }}/cake passbolt migrate
+  become_user: "{{ passbolt_user }}"
+  listen: update passbolt
+
+- name: clear database cache
+  command: |
+    {{ passbolt_bin_path }}/cake cache clear_all
+  become_user: "{{ passbolt_user }}"
+  listen: update passbolt
+
+- name: start nginx
+  service:
+    name: nginx
+    state: started
+  listen: update passbolt
