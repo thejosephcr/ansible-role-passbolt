@@ -332,7 +332,7 @@
       tags:
         - replica
 
-    - name: configure ssh public key for rsync use
+    - name: create ssh public key for rsync use
       copy:
         dest: "{{ item.path }}"
         content: |
