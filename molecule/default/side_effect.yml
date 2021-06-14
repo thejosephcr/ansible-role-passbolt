@@ -7,40 +7,12 @@
 
   tasks:
 
-    - name: verify frontpage content
-      uri:
-        url: http://localhost/
-        status_code: 200
-      register: _frontpage_content
-      until: _frontpage_content is not failed
-      retries: 12
-      delay: 15
-
-    - name: verify passbolt status before backup
-      command: "{{ passbolt_bin_path }}/cake passbolt healthcheck"
-      become_user: "{{ passbolt_user }}"
-      register: _passbolt_healthcheck_result
-
-    - name: debug passbolt healthcheck result
-      debug:
-        var: _passbolt_healthcheck_result.stdout_lines
-
     - name: take passbolt backup
       command: /usr/local/bin/passbolt-backup
       register: _backup_script
       until: _backup_script is not failed
       retries: 5
       delay: 5
-
-    - name: confirm database exist
-      command: |
-        mysql -u {{ passbolt_db_user }} -p{{ passbolt_db_pass }} \
-        -e "show databases;"
-      register: _database_output
-
-    - name: debug passbolt database output
-      debug:
-        var: _database_output.stdout_lines
 
     - name: kill mysql connections
       command: |
@@ -78,22 +50,3 @@
       until: _restore_script is not failed
       retries: 5
       delay: 5
-
-    - name: confirm database exist
-      command: |
-        mysql -u {{ passbolt_db_user }} -p{{ passbolt_db_pass }} \
-        -e "show databases;"
-      register: _database_output
-
-    - name: debug passbolt database output
-      debug:
-        var: _database_output.stdout_lines
-
-    - name: verify passbolt status after restore
-      command: "{{ passbolt_bin_path }}/cake passbolt healthcheck"
-      become_user: "{{ passbolt_user }}"
-      register: _passbolt_healthcheck_result
-
-    - name: debug passbolt healthcheck result
-      debug:
-        var: _passbolt_healthcheck_result.stdout_lines

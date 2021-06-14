@@ -7,10 +7,36 @@
 
   tasks:
 
-    - name: test update passbolt installation
+    - name: verify frontpage content
+      uri:
+        url: http://localhost/
+        status_code: 200
+      register: _frontpage_content
+      until: _frontpage_content is not failed
+      retries: 12
+      delay: 15
+
+    - name: verify passbolt status
+      command: "{{ passbolt_bin_path }}/cake passbolt healthcheck"
+      become_user: "{{ passbolt_user }}"
+      register: _passbolt_healthcheck_result
+
+    - name: debug passbolt healthcheck result
+      debug:
+        var: _passbolt_healthcheck_result.stdout_lines
+
+    - name: verify if database exists
+      command: |
+        mysql -u {{ passbolt_db_user }} -p{{ passbolt_db_pass }} \
+        -e "show databases;"
+      register: _database_output
+
+    - name: debug passbolt database output
+      debug:
+        var: _database_output.stdout_lines
+
+    - name: apply passbolt update to a new version
       include_role:
         name: wpnops.passbolt
       vars:
         passbolt_release: v3.2.1
-
-- import_playbook: side_effect.yml
