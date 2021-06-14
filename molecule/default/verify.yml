@@ -1,0 +1,16 @@
+---
+- name: verify
+
+  hosts: all
+
+  become: true
+
+  tasks:
+
+    - name: test update passbolt installation
+      include_role:
+        name: wpnops.passbolt
+      vars:
+        passbolt_release: v3.2.1
+
+- import_playbook: side_effect.yml
