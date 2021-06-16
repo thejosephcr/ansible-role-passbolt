@@ -355,7 +355,7 @@
         - replica
 
     - name: configure ssh public key for rsync use
-      ansible.posix.authorized_key:
+      authorized_key:
         user: "{{ passbolt_user_replication }}"
         state: present
         key: "{{ passbolt_repl_ssh_public_key }}"
