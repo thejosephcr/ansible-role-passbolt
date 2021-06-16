@@ -311,9 +311,7 @@
         ssh_priv_key: "{{ passbolt_repl_ssh_priv_key }}"
         ssh_public_key: "{{ passbolt_repl_ssh_public_key }}"
         ssh_priv_key_path: "{{ passbolt_ssh_repl_key_path }}"
-      delegate_to: "{{ passbolt_master }}"
       become_user: "{{ passbolt_user_replication }}"
-      run_once: yes
       tags:
         - replica
 
@@ -327,8 +325,6 @@
         ssh_key_filename: "{{ passbolt_ssh_key_filename }}"
         ssh_replica_user: "{{ passbolt_user_replication }}"
         ssh_replica_host: "{{ passbolt_slave }}"
-      delegate_to: "{{ passbolt_master }}"
-      run_once: yes
       tags:
         - replica
 
@@ -348,9 +344,7 @@
         ssh_key_filename: "{{ passbolt_ssh_key_filename }}"
         ssh_path: "{{ passbolt_ssh_path }}/{{ ssh_key_filename }}"
         ssh_public_key: "{{ passbolt_repl_ssh_public_key }}"
-      delegate_to: "{{ passbolt_slave }}"
       become_user: "{{ passbolt_user_replication }}"
-      run_once: yes
       tags:
         - replica
 
@@ -359,9 +353,7 @@
         user: "{{ passbolt_user_replication }}"
         state: present
         key: "{{ passbolt_repl_ssh_public_key }}"
-      delegate_to: "{{ passbolt_slave }}"
       become_user: "{{ passbolt_user_replication }}"
-      run_once: yes
       tags:
         - replica
 
