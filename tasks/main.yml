@@ -195,6 +195,14 @@
     state: present
     user: "{{ passbolt_user }}"
 
+- name: create cleanup cronjob
+  cron:
+    name: 'passbolt cleanup'
+    job: "{{ passbolt_root }}/bin/cake passbolt cleanup"
+    state: present
+    special_time: hourly
+    user: "{{ passbolt_user }}"
+
 - name: create passbolt directories
   file:
     path: "{{ passbolt_backup_target }}"
