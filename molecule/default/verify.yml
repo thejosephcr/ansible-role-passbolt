@@ -34,9 +34,3 @@
     - name: debug passbolt database output
       debug:
         var: _database_output.stdout_lines
-
-    - name: apply passbolt update to a new version
-      include_role:
-        name: wpnops.passbolt
-      vars:
-        passbolt_release: v3.2.1

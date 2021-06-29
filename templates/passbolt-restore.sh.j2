@@ -7,7 +7,7 @@ function perform_restore(){
     # find latest backup file
     echo "Restoring $rst_origin server. Finding latest $origin_file.tgz file..."
 
-    for file in $(find {{ backup_path }} -type f -name ".*$origin_file.tgz")
+    for file in $(find {{ backup_path }} -type f -name "*.$origin_file.tgz")
     do
         [[ $file -nt $latest_backup ]] && latest_backup=$file
     done
