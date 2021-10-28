@@ -7,6 +7,8 @@ function perform_restore(){
     # find latest backup file
     echo "Restoring $rst_origin server. Finding latest $origin_file.tgz file..."
 
+    origin_file=passbolt-*
+
     for file in $(find {{ backup_path }} -type f -name "*.$origin_file.tgz")
     do
         [[ $file -nt $latest_backup ]] && latest_backup=$file
@@ -36,20 +38,9 @@ function perform_restore(){
     fi
 }
 
-function verify_restore_server(){
-
-    origin_file=passbolt-.*;
-
-    if [[ -n "$origin_file" ]]; then
-        perform_restore
-    else
-        echo -e "There are no backup available for passbolt to restore..."
-    fi
-}
-
 unset -v latest_backup
 unset -v rst_option
 unset -v rst_origin
 unset -v origin_file
 
-verify_restore_server
+perform_restore
