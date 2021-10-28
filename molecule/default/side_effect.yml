@@ -45,7 +45,7 @@
         var: _passbolt_healthcheck_result.stderr_lines
 
     - name: perform passbolt restore
-      command: /usr/local/bin/passbolt-restore master
+      command: /usr/local/bin/passbolt-restore
       register: _restore_script
       until: _restore_script is not failed
       retries: 5

@@ -37,8 +37,10 @@ passbolt_smtp_tls_enabled: "false"
 passbolt_email_user: "passbolt"
 
 passbolt_backup_target: /backups
+passbolt_backup_dr_target: /backupsdr
 passbolt_backup_bin: /usr/local/bin/passbolt-backup
 passbolt_restore_bin: /usr/local/bin/passbolt-restore
+passbolt_restore_dr_bin: /usr/local/bin/passbolt-restore-dr
 passbolt_retention_backup: 5
 # Only with replication
 passbolt_user_replication: "replica"

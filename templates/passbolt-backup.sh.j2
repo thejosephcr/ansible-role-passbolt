@@ -23,7 +23,7 @@ rm -f $TMPFILE
 
 {% if backup_replica != inventory_hostname %}
 # sync file with other servers
-sudo su -c "/usr/bin/rsync {{ backup_path }}/$TIMENAME.{{ backup_identifier }}.tgz {{ backup_replica }}:{{ backup_path }}/ --progress --ignore-existing" {{ passbolt_user_replication }}
+sudo su -c "/usr/bin/rsync {{ backup_path }}/$TIMENAME.{{ backup_identifier }}.tgz {{ backup_replica }}:{{ backup_dr_path }}/ --progress --ignore-existing" {{ passbolt_user_replication }}
 {% elif backup_replica == inventory_hostname %}
 # prune stale backups of master server
 /usr/bin/find {{ backup_path }}/ -name "*\.passbolt-{{ passbolt_master }}.tgz" -ctime +{{ (retention_period |int + 7) }} -delete

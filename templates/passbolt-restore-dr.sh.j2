@@ -5,9 +5,9 @@
 function perform_restore(){
 
     # find latest backup file
-    echo "Restoring $rst_origin server. Finding latest $origin_file.tgz file..."
+    echo "Restoring passbolt. Finding latest $origin_file.tgz file..."
 
-    for file in $(find {{ backup_path }} -type f -name "*.$origin_file.tgz")
+    for file in $(find {{ backup_dr_path }} -type f -name "*.$origin_file.tgz")
     do
         [[ $file -nt $latest_backup ]] && latest_backup=$file
     done
@@ -43,7 +43,7 @@ function verify_restore_server(){
     if [[ -n "$origin_file" ]]; then
         perform_restore
     else
-        echo -e "There are no backup available for passbolt to restore..."
+        echo -e "There are no backup available for passbolt..."
     fi
 }
 

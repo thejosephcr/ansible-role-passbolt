@@ -224,6 +224,7 @@
     mode: 0750
   vars:
     backup_path: "{{ passbolt_backup_target }}"
+    backup_dr_path: "{{ passbolt_backup_dr_target }}"
     backup_db: "{{ passbolt_db_name }}"
     backup_db_user: "{{ passbolt_db_user }}"
     backup_db_pass: "{{ passbolt_db_pass }}"
@@ -245,7 +246,20 @@
     backup_path: "{{ passbolt_backup_target }}"
     backup_db_user: "{{ passbolt_db_user }}"
     backup_db_pass: "{{ passbolt_db_pass }}"
-    backup_identifier: "passbolt-{{ inventory_hostname }}"
+  tags:
+    - restore
+
+- name: create passbolt dr restore script
+  template:
+    src: templates/passbolt-restore-dr.sh.j2
+    dest: "{{ passbolt_restore_dr_bin }}"
+    group: root
+    owner: root
+    mode: 0750
+  vars:
+    backup_dr_path: "{{ passbolt_backup_dr_target }}"
+    backup_db_user: "{{ passbolt_db_user }}"
+    backup_db_pass: "{{ passbolt_db_pass }}"
   tags:
     - restore
 
@@ -267,7 +281,8 @@
       echo
       echo run passbolt-backup to manually force passbolt backup creation
       echo run passbolt-restore and follow instructions to manually restore latest passbolt backup
-      echo run passbolt-restore <master or slave> to manually restore latest passbolt backup
+      echo run passbolt-restore to manually restore latest passbolt backup from local server
+      echo run passbolt-restore-dr to manually restore latest passbolt backup from dr path
       echo
     mode: 0755
 
