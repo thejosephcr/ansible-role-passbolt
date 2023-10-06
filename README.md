@@ -1,9 +1,9 @@
 # ansible-role-passbolt
 
-[![Build Status](https://github.com/wpnops/ansible-role-passbolt/workflows/CI/badge.svg)](https://github.com/wpnops/ansible-role-passbolt/actions)
-[![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-wpnops.passbolt.vim-blue.svg)](https://galaxy.ansible.com/wpninfra/passbolt/)
+[![Build Status](https://github.com/pokerops/ansible-role-passbolt/workflows/CI/badge.svg)](https://github.com/pokerops/ansible-role-passbolt/actions)
+[![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-pokerops.passbolt.vim-blue.svg)](https://galaxy.ansible.com/pokerops/passbolt/)
 
-An [ansible role](https://galaxy.ansible.com/wpnops/passbolt) to install and configure ansible-role-passbolt
+An [ansible role](https://galaxy.ansible.com/pokerops/passbolt) to install and configure ansible-role-passbolt
 
 ## Role Variables
 
@@ -18,7 +18,7 @@ By default this role does depend on someone external roles. If any such dependen
 ```
 - hosts: servers
   roles:
-     - role: wpnops.passbolt
+     - role: pokerops.passbolt
 ```
 
 ## Testing

@@ -7,7 +7,7 @@
 
   roles:
 
-    - wpnops.passbolt
+    - pokerops.passbolt
 
   pre_tasks:
 

@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   role_name: passbolt
-  author: wpnops
+  author: pokerops
   description: An Ansible role to install and configure Passbolt
   license: MIT
   min_ansible_version: 2.9.11
