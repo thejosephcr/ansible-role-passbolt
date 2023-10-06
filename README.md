@@ -1,6 +1,6 @@
 # ansible-role-passbolt
 
-[![Build Status](https://github.com/pokerops/ansible-role-passbolt/workflows/CI/badge.svg)](https://github.com/pokerops/ansible-role-passbolt/actions)
+[![Build Status][(https://github.com/pokerops/ansible-role-passbolt/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/pokerops/ansible-role-passbolt/actions/workflows/main.yml)
 [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-pokerops.passbolt.vim-blue.svg)](https://galaxy.ansible.com/pokerops/passbolt/)
 
 An [ansible role](https://galaxy.ansible.com/pokerops/passbolt) to install and configure ansible-role-passbolt
